@@ -15,6 +15,7 @@ const loginReducer = (state = INITIAL_STATE, { payload, type }) => {
     return {
       ...state,
       player: {
+        ...state.player,
         name: payload.valueName,
         gravatarEmail: payload.valueEmail,
       },
