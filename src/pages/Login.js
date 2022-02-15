@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import addLogin from '../redux/actions';
+import { addLogin, fetchTokenApi } from '../redux/actions';
 
 class Login extends React.Component {
   constructor() {
@@ -32,14 +32,14 @@ class Login extends React.Component {
 
   handleClick(event) {
     event.preventDefault();
-    const { submitLogin } = this.props;
+    const { submitLogin, history, getToken } = this.props;
     submitLogin(this.state);
+    getToken();
+    history.push('/game');
   }
 
   render() {
     const { valueName, valueEmail, isDisabled } = this.state;
-    const { loginEmail, loginName } = this.props;
-    console.log(loginEmail, loginName);
 
     return (
       <section>
@@ -82,13 +82,9 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ login }) => ({
-  loginEmail: login.email,
-  loginName: login.nome,
-});
-
 const mapDispatchToProps = (dispatch) => ({
   submitLogin: (payload) => dispatch(addLogin(payload)),
+  getToken: () => dispatch(fetchTokenApi()),
 });
 
 Login.propTypes = {
@@ -96,4 +92,4 @@ Login.propTypes = {
   login: PropTypes.string,
 }.isRequired;
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+export default connect(null, mapDispatchToProps)(Login);
