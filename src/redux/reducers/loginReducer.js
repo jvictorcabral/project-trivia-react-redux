@@ -1,8 +1,12 @@
 import { ADD_LOGIN } from '../actions/actionsType';
 
 const INITIAL_STATE = {
-  nome: '',
-  email: '',
+  player: {
+    name: '',
+    assertions: 0,
+    score: 0,
+    gravatarEmail: '',
+  },
 };
 
 const loginReducer = (state = INITIAL_STATE, { payload, type }) => {
@@ -10,8 +14,10 @@ const loginReducer = (state = INITIAL_STATE, { payload, type }) => {
   case ADD_LOGIN:
     return {
       ...state,
-      nome: payload.valueName,
-      email: payload.valueEmail,
+      player: {
+        name: payload.valueName,
+        gravatarEmail: payload.valueEmail,
+      },
     };
   default:
     return state;
