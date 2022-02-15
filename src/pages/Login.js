@@ -15,6 +15,7 @@ class Login extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.handleClickSettings = this.handleClickSettings.bind(this);
   }
 
   handleChange({ target: { name, value } }) {
@@ -36,6 +37,11 @@ class Login extends React.Component {
     submitLogin(this.state);
     getToken();
     history.push('/game');
+  }
+
+  handleClickSettings() {
+    const { history } = this.props;
+    history.push('/settings');
   }
 
   render() {
@@ -75,6 +81,14 @@ class Login extends React.Component {
             onClick={ this.handleClick }
           >
             Play
+          </button>
+
+          <button
+            type="button"
+            data-testid="btn-settings"
+            onClick={ this.handleClickSettings }
+          >
+            Settings
           </button>
         </form>
       </section>
