@@ -1,4 +1,4 @@
-import fetchToken from '../../services/api';
+import { fetchToken } from '../../services/api';
 import { saveTokenLocalStorage } from '../../services/token';
 import { ADD_LOGIN, GET_TOKEN } from './actionsType';
 
