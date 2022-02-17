@@ -55,21 +55,23 @@ class Game extends Component {
 
   render() {
     const { questions } = this.state;
-    // const i = 0;
+    const question = questions[0];
+    /*     const i = 0; */
     return (
-      <div>
+      <section>
         <Header />
-        {questions.map(({ category, question, shuffledAnswers }) => (
+        { question !== undefined
+        && (
           <>
             <p data-testid="question-category">
-              { category }
+              { question.category }
             </p>
 
             <p data-testid="question-text">
-              { question }
+              { question.question }
             </p>
-            <div data-testid="answer-option">
-              {shuffledAnswers.map(({ value }, i) => (
+            <div data-testid="answer-options">
+              {question.shuffledAnswers.map(({ value }, i) => (
                 <button
                   key={ i }
                   type="button"
@@ -82,9 +84,9 @@ class Game extends Component {
               ))}
             </div>
           </>
-
-        ))}
-      </div>
+        )}
+        ;
+      </section>
     );
   }
 }

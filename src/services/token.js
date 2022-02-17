@@ -15,22 +15,13 @@ export const getTokenLocalStorage = () => {
 export const getToken = () => {
   const { getState, dispatch } = store;
   let { token } = getState();
-  console.log('token no getToken', token);
   if (token) {
     return token;
   }
   token = getTokenLocalStorage();
-  console.log('token no localStorage', token);
   if (token) {
     dispatch(setToken(token));
     return token;
   }
   return null;
-};
-
-export const teste = () => {
-  // const storeSubs = store.subscribe(() => {
-  //   console.log(store.getState());
-  // });
-  // console.log(store.getState(), store, storeSubs);
 };
