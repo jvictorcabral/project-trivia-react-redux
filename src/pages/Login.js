@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { addLogin, fetchTokenApi } from '../redux/actions';
+import { addLogin, getNewTokenAndSave } from '../redux/actions';
 
 class Login extends React.Component {
   constructor() {
@@ -31,11 +31,11 @@ class Login extends React.Component {
     });
   }
 
-  handleClick(event) {
+  async handleClick(event) {
     event.preventDefault();
-    const { submitLogin, history, getToken } = this.props;
+    const { submitLogin, history, getNewToken } = this.props;
     submitLogin(this.state);
-    getToken();
+    await getNewToken();
     history.push('/game');
   }
 
@@ -98,7 +98,7 @@ class Login extends React.Component {
 
 const mapDispatchToProps = (dispatch) => ({
   submitLogin: (payload) => dispatch(addLogin(payload)),
-  getToken: () => dispatch(fetchTokenApi()),
+  getNewToken: () => dispatch(getNewTokenAndSave()),
 });
 
 Login.propTypes = {
