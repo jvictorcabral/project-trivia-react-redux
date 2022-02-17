@@ -1,3 +1,4 @@
+/* eslint-disable no-return-assign */
 import React, { Component } from 'react';
 
 // PropTypes:
@@ -5,7 +6,7 @@ import PropTypes from 'prop-types';
 
 // React-Redux:
 import { connect } from 'react-redux';
-import { getNewTokenAndSave } from '../redux/actions';
+import { getNewTokenAndSave, setScore } from '../redux/actions';
 
 // Components:
 import Header from '../components/Header';
@@ -15,19 +16,30 @@ import { fetchQuestions } from '../services/api';
 import shuffleAnswers from '../services/shuffleAnswers';
 import { getToken } from '../services/token';
 
+const DIFFICULTY_LEVEL = {
+  hard: 3,
+  medium: 2,
+  easy: 1,
+};
+
+const NUMBER_SUM_SCORE = 10;
+
 class Game extends Component {
   constructor() {
     super();
     this.state = {
-      questions: [],
+      assertions: 0,
       currentTimer: 30,
       disabled: false,
+      questions: [],
+      score: 0,
     };
 
     this.dataManipulation = this
       .dataManipulation.bind(this);
     this.fetchQuestionsAndDataManipulation = this
       .fetchQuestionsAndDataManipulation.bind(this);
+    this.handleClickAnswer = this.handleClickAnswer.bind(this);
     this.timeCounter = this
       .timeCounter.bind(this);
   }
@@ -86,6 +98,28 @@ class Game extends Component {
     }, TIMER_INTERVAL);
   }
 
+  handleClickAnswer({ target: { innerText } }, question) {
+    const { scoreAndAssertions } = this.props;
+    const { currentTimer } = this.state;
+    const { correct_answer: correctAnswer, difficulty } = question;
+    if (innerText === correctAnswer) {
+      const sumScore = NUMBER_SUM_SCORE + (currentTimer * DIFFICULTY_LEVEL[difficulty]);
+      this.setState((prevState) => {
+        const score = prevState.score + sumScore;
+        const assertions = prevState.assertions + 1;
+        scoreAndAssertions({ score, assertions });
+        return {
+          assertions,
+          score,
+        };
+      });
+    }
+    this.setState((prevState) => ({
+      disabled: !prevState.disabled,
+    }));
+    clearInterval(this.timer);
+  }
+
   render() {
     const { questions, disabled, currentTimer } = this.state;
     const question = questions[0];
@@ -106,11 +140,12 @@ class Game extends Component {
               {question.shuffledAnswers.map(({ value }, i) => (
                 <button
                   key={ i }
-                  type="button"
+                  type="submit"
                   disabled={ disabled }
                   data-testid={ value.correct === true
                     ? 'correct-answer'
                     : `wrong-answer-${i}` }
+                  onClick={ (event) => this.handleClickAnswer(event, question) }
                 >
                   {value.answer}
                 </button>
@@ -130,6 +165,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   getNewToken: () => dispatch(getNewTokenAndSave()),
+  scoreAndAssertions: (payload) => dispatch(setScore(payload)),
 });
 
 Game.propTypes = { getNewToken: PropTypes.func, token: PropTypes.string }.isRequired;

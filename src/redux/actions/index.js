@@ -1,6 +1,6 @@
 import { fetchToken } from '../../services/api';
 import { saveTokenLocalStorage } from '../../services/token';
-import { ADD_LOGIN, SET_TOKEN } from './actionsType';
+import { ADD_LOGIN, ADD_RANKING, SET_TOKEN, SET_URL_PICTURE } from './actionsType';
 
 export const addLogin = (payload) => ({
   type: ADD_LOGIN,
@@ -9,6 +9,16 @@ export const addLogin = (payload) => ({
 
 export const setToken = (payload) => ({
   type: SET_TOKEN,
+  payload,
+});
+
+export const setScore = (payload) => ({
+  type: ADD_RANKING,
+  payload,
+});
+
+export const setPictureUrl = (payload) => ({
+  type: SET_URL_PICTURE,
   payload,
 });
 
