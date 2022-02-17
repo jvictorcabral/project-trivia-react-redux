@@ -1,8 +1,16 @@
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+
+// PropTypes:
+import PropTypes from 'prop-types';
+
+// React-Redux:
 import { connect } from 'react-redux';
-import Header from '../components/Header';
 import { getNewTokenAndSave } from '../redux/actions';
+
+// Components:
+import Header from '../components/Header';
+
+// Funcoes:
 import { fetchQuestions } from '../services/api';
 import shuffleAnswers from '../services/shuffleAnswers';
 import { getToken } from '../services/token';
@@ -12,16 +20,25 @@ class Game extends Component {
     super();
     this.state = {
       questions: [],
+      currentTimer: 30,
+      disabled: false,
     };
 
-    this.fetchQuestionsAndDataManipulation = this
-      .fetchQuestionsAndDataManipulation.bind(this);
     this.dataManipulation = this
       .dataManipulation.bind(this);
+    this.fetchQuestionsAndDataManipulation = this
+      .fetchQuestionsAndDataManipulation.bind(this);
+    this.timeCounter = this
+      .timeCounter.bind(this);
   }
 
   componentDidMount() {
     this.fetchQuestionsAndDataManipulation();
+    this.timeCounter();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   async fetchQuestionsAndDataManipulation() {
@@ -53,10 +70,25 @@ class Game extends Component {
     });
   }
 
+  timeCounter() {
+    const TIMER_INTERVAL = 1000;
+    this.timer = setInterval(() => {
+      this.setState((prevState) => {
+        const currentTimer = prevState.currentTimer - 1;
+        if (currentTimer === 0) {
+          clearInterval(this.timer);
+          this.setState({ disabled: currentTimer === 0 });
+        }
+        return {
+          currentTimer,
+        };
+      });
+    }, TIMER_INTERVAL);
+  }
+
   render() {
-    const { questions } = this.state;
+    const { questions, disabled, currentTimer } = this.state;
     const question = questions[0];
-    /*     const i = 0; */
     return (
       <section>
         <Header />
@@ -75,6 +107,7 @@ class Game extends Component {
                 <button
                   key={ i }
                   type="button"
+                  disabled={ disabled }
                   data-testid={ value.correct === true
                     ? 'correct-answer'
                     : `wrong-answer-${i}` }
@@ -82,10 +115,10 @@ class Game extends Component {
                   {value.answer}
                 </button>
               ))}
+              <p>{`Tempo para resposta: ${currentTimer}`}</p>
             </div>
           </>
         )}
-        ;
       </section>
     );
   }
