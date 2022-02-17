@@ -1,19 +1,19 @@
 import { fetchToken } from '../../services/api';
 import { saveTokenLocalStorage } from '../../services/token';
-import { ADD_LOGIN, GET_TOKEN } from './actionsType';
+import { ADD_LOGIN, SET_TOKEN } from './actionsType';
 
 export const addLogin = (payload) => ({
   type: ADD_LOGIN,
   payload,
 });
 
-const getToken = (payload) => ({
-  type: GET_TOKEN,
+export const setToken = (payload) => ({
+  type: SET_TOKEN,
   payload,
 });
 
-export const fetchTokenApi = () => async (dispatch) => {
-  const fetchAPI = await fetchToken();
-  dispatch(getToken(fetchAPI.token));
-  saveTokenLocalStorage(fetchAPI);
+export const getNewTokenAndSave = () => async (dispatch) => {
+  const { token } = await fetchToken();
+  dispatch(setToken(token));
+  saveTokenLocalStorage(token);
 };

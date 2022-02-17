@@ -1,57 +1,88 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 import Header from '../components/Header';
+import { getNewTokenAndSave } from '../redux/actions';
 import { fetchQuestions } from '../services/api';
-import { fetchTokenApi } from '../redux/actions';
+import shuffleAnswers from '../services/shuffleAnswers';
+import { getToken } from '../services/token';
 
 class Game extends Component {
   constructor() {
     super();
-    this.fetchQuestionsAPI = this.fetchQuestionsAPI.bind(this);
     this.state = {
-      results: [],
+      questions: [],
     };
+
+    this.fetchQuestionsAndDataManipulation = this
+      .fetchQuestionsAndDataManipulation.bind(this);
+    this.dataManipulation = this
+      .dataManipulation.bind(this);
   }
 
   componentDidMount() {
-    this.fetchQuestionsAPI();
+    this.fetchQuestionsAndDataManipulation();
   }
 
-  async fetchQuestionsAPI() {
-    const { token, getToken } = this.props;
+  async fetchQuestionsAndDataManipulation() {
+    const { getNewToken } = this.props;
+    const INVALID = 3;
+    const token = getToken();
     const questions = await fetchQuestions(token);
-    if (questions.response_code === 0) {
-      this.setState({ results: questions.results });
+    if (questions.response_code === INVALID) {
+      await getNewToken();
+      this.fetchQuestionsAndDataManipulation();
     } else {
-      getToken();
+      this.dataManipulation(questions.results);
     }
   }
 
+  dataManipulation(questions) {
+    const stateAnswers = questions.map((item) => {
+      const answers = item.incorrect_answers
+        .map((answer) => ({ answer, correct: false }));
+      answers.push({ answer: item.correct_answer, correct: true });
+      const shuffledAnswers = shuffleAnswers(answers);
+      return {
+        ...item,
+        shuffledAnswers,
+      };
+    });
+    this.setState({
+      questions: stateAnswers,
+    });
+  }
+
   render() {
-    const { results } = this.state;
+    const { questions } = this.state;
+    // const i = 0;
     return (
       <div>
         <Header />
-        <h2>Jogo Iniciado</h2>
-        { results.map((element, i) => (
-          <div key={ i }>
-            <h3
-              data-testid="question-category"
-            >
-              Category:
-              {' '}
-              { element.category }
-            </h3>
+        {questions.map(({ category, question, shuffledAnswers }) => (
+          <>
+            <p data-testid="question-category">
+              { category }
+            </p>
 
-            <h3
-              data-testid="question-text"
-            >
-              Question:
-              {' '}
-              { element.question }
-            </h3>
-          </div>
+            <p data-testid="question-text">
+              { question }
+            </p>
+            <div data-testid="answer-option">
+              {shuffledAnswers.map(({ value }, i) => (
+                <button
+                  key={ i }
+                  type="button"
+                  data-testid={ value.correct === true
+                    ? 'correct-answer'
+                    : `wrong-answer-${i}` }
+                >
+                  {value.answer}
+                </button>
+              ))}
+            </div>
+          </>
+
         ))}
       </div>
     );
@@ -63,12 +94,9 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  getToken: () => dispatch(fetchTokenApi()),
+  getNewToken: () => dispatch(getNewTokenAndSave()),
 });
 
-Game.propTypes = {
-  token: PropTypes.string.isRequired,
-  getToken: PropTypes.func.isRequired,
-};
+Game.propTypes = { getNewToken: PropTypes.func, token: PropTypes.string }.isRequired;
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game);
