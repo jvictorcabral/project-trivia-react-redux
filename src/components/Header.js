@@ -2,15 +2,25 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import md5 from 'crypto-js/md5';
 import { connect } from 'react-redux';
+import { setPictureUrl } from '../redux/actions';
 
 class Header extends React.Component {
+  componentDidMount() {
+    this.setPicture();
+  }
+
+  setPicture = () => {
+    const { email, setUrlPicture } = this.props;
+    const urlPicture = md5(email).toString();
+    setUrlPicture(urlPicture);
+  }
+
   render() {
     const {
       name,
       score,
       email,
     } = this.props;
-
     const hash = md5(email).toString();
 
     return (
@@ -40,9 +50,13 @@ class Header extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  name: state.login.player.name,
-  score: state.login.player.score,
-  email: state.login.player.gravatarEmail,
+  name: state.player.name,
+  score: state.player.score,
+  email: state.player.gravatarEmail,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  setUrlPicture: (payload) => dispatch(setPictureUrl(payload)),
 });
 
 Header.propTypes = {
@@ -51,4 +65,4 @@ Header.propTypes = {
   email: PropTypes.string,
 }.isRequired;
 
-export default connect(mapStateToProps, null)(Header);
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
