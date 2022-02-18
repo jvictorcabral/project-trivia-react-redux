@@ -1,16 +1,8 @@
 import React, { Component } from 'react';
-
-// PropTypes:
 import PropTypes from 'prop-types';
-
-// React-Redux:
 import { connect } from 'react-redux';
 import { getNewTokenAndSave, setScore } from '../redux/actions';
-
-// Components:
 import Header from '../components/Header';
-
-// Funcoes:
 import { fetchQuestions } from '../services/api';
 import shuffleArray from '../services/shuffleArray';
 import { getToken } from '../services/token';
@@ -31,6 +23,7 @@ class Game extends Component {
       assertions: 0,
       currentTimer: 30,
       disabled: false,
+      indiceQuestion: 0,
       questions: [],
       score: 0,
     };
@@ -40,6 +33,7 @@ class Game extends Component {
     this.fetchQuestionsAndDataManipulation = this
       .fetchQuestionsAndDataManipulation.bind(this);
     this.handleClickAnswer = this.handleClickAnswer.bind(this);
+    this.handleClickNextQuestion = this.handleClickNextQuestion.bind(this);
     this.timeCounter = this
       .timeCounter.bind(this);
   }
@@ -89,7 +83,9 @@ class Game extends Component {
         const currentTimer = prevState.currentTimer - 1;
         if (currentTimer === 0) {
           clearInterval(this.timer);
-          this.setState({ disabled: currentTimer === 0 });
+          this.setState({
+            disabled: currentTimer === 0,
+            indiceQuestion: prevState.indiceQuestion + 1 });
         }
         return {
           currentTimer,
@@ -111,19 +107,41 @@ class Game extends Component {
         return {
           assertions,
           score: scorePlayer,
+          visible: !prevState.visible,
         };
       });
     }
     this.setState((prevState) => ({
       disabled: !prevState.disabled,
+      visible: true,
     }));
     clearInterval(this.timer);
     addRanking({ name, score, picture });
   }
 
+  handleClickNextQuestion() {
+    const { history } = this.props;
+    const { indiceQuestion, questions } = this.state;
+
+    if (indiceQuestion < questions.length - 1) {
+      this.setState(({ disabled, indiceQuestion: indice }) => ({
+        disabled: !disabled,
+        indiceQuestion: indice + 1,
+        currentTimer: 30,
+      }));
+    } else {
+      history.push('/feedback');
+      this.setState({
+        disabled: true,
+        currentTimer: 30,
+      });
+    }
+    this.timeCounter();
+  }
+
   render() {
-    const { questions, disabled, currentTimer } = this.state;
-    const question = questions[0];
+    const { questions, disabled, currentTimer, indiceQuestion } = this.state;
+    const question = questions[indiceQuestion];
     return (
       <section>
         <Header />
@@ -141,7 +159,7 @@ class Game extends Component {
               {question.shuffledAnswers.map(({ value }, i) => (
                 <button
                   key={ i }
-                  type="submit"
+                  type="button"
                   disabled={ disabled }
                   data-testid={ value.correct === true
                     ? 'correct-answer'
@@ -155,15 +173,24 @@ class Game extends Component {
             </div>
           </>
         )}
+        <div className="next">
+          <button
+            type="button"
+            style={ disabled ? { visibility: 'visible' } : { visibility: 'collapse' } }
+            data-testid="btn-next"
+            onClick={ this.handleClickNextQuestion }
+          >
+            Next
+          </button>
+        </div>
       </section>
     );
   }
 }
 
-const mapStateToProps = (state) => ({
-  token: state.token,
-  picture: state.player.picture,
-  name: state.player.name,
+const mapStateToProps = ({ player }) => ({
+  name: player.name,
+  picture: player.picture,
 });
 
 const mapDispatchToProps = (dispatch) => ({
