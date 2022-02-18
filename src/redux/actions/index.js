@@ -7,11 +7,6 @@ export const addLogin = (payload) => ({
   payload,
 });
 
-export const setPictureUrl = (payload) => ({
-  type: SET_URL_PICTURE,
-  payload,
-});
-
 export const setScore = (payload) => ({
   type: ADD_RANKING,
   payload,
@@ -19,6 +14,11 @@ export const setScore = (payload) => ({
 
 export const setToken = (payload) => ({
   type: SET_TOKEN,
+  payload,
+});
+
+export const setPictureUrl = (payload) => ({
+  type: SET_URL_PICTURE,
   payload,
 });
 

@@ -1,5 +1,5 @@
 const { randoSequence } = require('@nastyox/rando.js');
 
-const shuffledArray = (array) => randoSequence(array);
+const shuffleArray = (array) => randoSequence(array);
 
-export default shuffledArray;
+export default shuffleArray;
