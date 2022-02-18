@@ -13,7 +13,7 @@ export function addRanking({ name, score, picture }) {
   const rankings = getRankingLocalStorage();
   const playerRanking = rankings.find((player) => player.picture === picture);
   if (playerRanking) {
-    playerRanking.score += score;
+    playerRanking.score = score;
     saveRankingLocalStorage(rankings);
     return;
   }
