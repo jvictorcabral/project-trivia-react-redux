@@ -1,4 +1,3 @@
-/* eslint-disable no-return-assign */
 import React, { Component } from 'react';
 
 // PropTypes:
@@ -13,8 +12,9 @@ import Header from '../components/Header';
 
 // Funcoes:
 import { fetchQuestions } from '../services/api';
-import shuffleAnswers from '../services/shuffleAnswers';
+import shuffleArray from '../services/shuffleArray';
 import { getToken } from '../services/token';
+import { addRanking } from '../services/ranking';
 
 const DIFFICULTY_LEVEL = {
   hard: 3,
@@ -71,7 +71,7 @@ class Game extends Component {
       const answers = item.incorrect_answers
         .map((answer) => ({ answer, correct: false }));
       answers.push({ answer: item.correct_answer, correct: true });
-      const shuffledAnswers = shuffleAnswers(answers);
+      const shuffledAnswers = shuffleArray(answers);
       return {
         ...item,
         shuffledAnswers,
@@ -99,18 +99,18 @@ class Game extends Component {
   }
 
   handleClickAnswer({ target: { innerText } }, question) {
-    const { scoreAndAssertions } = this.props;
-    const { currentTimer } = this.state;
+    const { scoreAndAssertions, picture, name } = this.props;
+    const { currentTimer, score } = this.state;
     const { correct_answer: correctAnswer, difficulty } = question;
     if (innerText === correctAnswer) {
       const sumScore = NUMBER_SUM_SCORE + (currentTimer * DIFFICULTY_LEVEL[difficulty]);
       this.setState((prevState) => {
-        const score = prevState.score + sumScore;
+        const scorePlayer = prevState.score + sumScore;
         const assertions = prevState.assertions + 1;
-        scoreAndAssertions({ score, assertions });
+        scoreAndAssertions({ scorePlayer, assertions });
         return {
           assertions,
-          score,
+          score: scorePlayer,
         };
       });
     }
@@ -118,6 +118,7 @@ class Game extends Component {
       disabled: !prevState.disabled,
     }));
     clearInterval(this.timer);
+    addRanking({ name, score, picture });
   }
 
   render() {
@@ -161,6 +162,8 @@ class Game extends Component {
 
 const mapStateToProps = (state) => ({
   token: state.token,
+  picture: state.player.picture,
+  name: state.player.name,
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -168,6 +171,9 @@ const mapDispatchToProps = (dispatch) => ({
   scoreAndAssertions: (payload) => dispatch(setScore(payload)),
 });
 
-Game.propTypes = { getNewToken: PropTypes.func, token: PropTypes.string }.isRequired;
+Game.propTypes = {
+  getNewToken: PropTypes.func,
+  token: PropTypes.string,
+}.isRequired;
 
 export default connect(mapStateToProps, mapDispatchToProps)(Game);

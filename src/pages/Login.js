@@ -1,15 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import md5 from 'crypto-js/md5';
 import PropTypes from 'prop-types';
-import { addLogin, getNewTokenAndSave } from '../redux/actions';
+import { addLogin, getNewTokenAndSave, setPictureUrl } from '../redux/actions';
+import { addRanking } from '../services/ranking';
 
 class Login extends React.Component {
   constructor() {
     super();
 
     this.state = {
-      valueName: '',
-      valueEmail: '',
+      name: '',
+      email: '',
+      picture: '',
       isDisabled: true,
     };
 
@@ -18,13 +21,17 @@ class Login extends React.Component {
     this.handleClickSettings = this.handleClickSettings.bind(this);
   }
 
-  handleChange({ target: { name, value } }) {
+  handleChange({ target: { name: nameInput, value } }) {
     this.setState({
-      [name]: value,
+      [nameInput]: value,
     }, () => {
-      const { valueEmail, valueName } = this.state;
-      if (valueName && valueEmail !== '') {
-        this.setState({ isDisabled: false });
+      const { name, email } = this.state;
+      if (name && email !== '') {
+        const picture = md5(email).toString();
+        this.setState({
+          isDisabled: false,
+          picture,
+        });
       } else {
         this.setState({ isDisabled: true });
       }
@@ -33,9 +40,12 @@ class Login extends React.Component {
 
   async handleClick(event) {
     event.preventDefault();
-    const { submitLogin, history, getNewToken } = this.props;
+    const { submitLogin, history, getNewToken, setUrlPicture } = this.props;
+    const { name, picture } = this.state;
     submitLogin(this.state);
     await getNewToken();
+    addRanking({ name, score: 0, picture });
+    setUrlPicture(picture);
     history.push('/game');
   }
 
@@ -45,7 +55,7 @@ class Login extends React.Component {
   }
 
   render() {
-    const { valueName, valueEmail, isDisabled } = this.state;
+    const { name, email, isDisabled } = this.state;
 
     return (
       <section>
@@ -56,8 +66,8 @@ class Login extends React.Component {
               data-testid="input-player-name"
               id="player"
               placeholder="Digite seu nome"
-              name="valueName"
-              value={ valueName }
+              name="name"
+              value={ name }
               onChange={ this.handleChange }
             />
           </label>
@@ -68,8 +78,8 @@ class Login extends React.Component {
               data-testid="input-gravatar-email"
               id="email"
               placeholder="Digite seu e-mail"
-              name="valueEmail"
-              value={ valueEmail }
+              name="email"
+              value={ email }
               onChange={ this.handleChange }
             />
           </label>
@@ -97,8 +107,9 @@ class Login extends React.Component {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  submitLogin: (payload) => dispatch(addLogin(payload)),
   getNewToken: () => dispatch(getNewTokenAndSave()),
+  setUrlPicture: (payload) => dispatch(setPictureUrl(payload)),
+  submitLogin: (payload) => dispatch(addLogin(payload)),
 });
 
 Login.propTypes = {
