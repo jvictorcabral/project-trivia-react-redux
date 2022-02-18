@@ -19,8 +19,8 @@ const playerReducer = (state = INITIAL_STATE, { payload, type }) => {
   case ADD_RANKING:
     return {
       ...state,
-      assertions: state.assertions + payload.assertions,
-      score: state.score + payload.scorePlayer,
+      assertions: payload.assertions,
+      score: payload.scorePlayer,
     };
   case SET_URL_PICTURE:
     return {

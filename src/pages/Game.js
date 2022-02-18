@@ -142,6 +142,7 @@ class Game extends Component {
   render() {
     const { questions, disabled, currentTimer, indiceQuestion } = this.state;
     const question = questions[indiceQuestion];
+    console.log(question);
     return (
       <section>
         <Header />
