@@ -6,7 +6,7 @@ import Header from '../components/Header';
 class Feedback extends Component {
   render() {
     const MIN = 3;
-    const { assertions, score } = this.props;
+    const { assertions, score, history } = this.props;
     return (
       <>
         <Header />
@@ -22,6 +22,13 @@ class Feedback extends Component {
         <p data-testid="feedback-total-question">
           { assertions }
         </p>
+        <button
+          type="button"
+          data-testid="btn-play-again"
+          onClick={ () => history.push('/') }
+        >
+          Play again
+        </button>
       </>
     );
   }
