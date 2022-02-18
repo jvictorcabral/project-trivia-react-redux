@@ -1,17 +1,28 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import Header from '../components/Header';
 
 class Feedback extends Component {
   render() {
     const MIN = 3;
-    const { assertions } = this.props;
+    const { assertions, score } = this.props;
     return (
-      <section data-testid="feedback-text">
-        { assertions < MIN
-          ? <p>Could be better...</p>
-          : <p>Well Done!</p>}
-      </section>
+      <>
+        <Header />
+        <div data-testid="feedback-text">
+          { assertions < MIN
+            ? <p>Could be better...</p>
+            : <p>Well Done!</p>}
+        </div>
+        <p data-testid="feedback-total-score">
+          { score }
+          pontos
+        </p>
+        <p data-testid="feedback-total-question">
+          { assertions }
+        </p>
+      </>
     );
   }
 }
