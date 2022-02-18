@@ -13,14 +13,14 @@ const playerReducer = (state = INITIAL_STATE, { payload, type }) => {
   case ADD_LOGIN:
     return {
       ...state,
-      name: payload.valueName,
-      gravatarEmail: payload.valueEmail,
+      name: payload.name,
+      gravatarEmail: payload.email,
     };
   case ADD_RANKING:
     return {
       ...state,
       assertions: state.assertions + payload.assertions,
-      score: state.score + payload.score,
+      score: state.score + payload.scorePlayer,
     };
   case SET_URL_PICTURE:
     return {
