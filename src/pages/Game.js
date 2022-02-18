@@ -7,6 +7,7 @@ import { fetchQuestions } from '../services/api';
 import shuffleArray from '../services/shuffleArray';
 import { getToken } from '../services/token';
 import { addRanking } from '../services/ranking';
+import './styles/game.css';
 
 const DIFFICULTY_LEVEL = {
   hard: 3,
@@ -24,6 +25,7 @@ class Game extends Component {
       currentTimer: 30,
       disabled: false,
       indiceQuestion: 0,
+      clicked: false,
       questions: [],
       score: 0,
     };
@@ -114,6 +116,7 @@ class Game extends Component {
     this.setState((prevState) => ({
       disabled: !prevState.disabled,
       visible: true,
+      clicked: true,
     }));
     clearInterval(this.timer);
     addRanking({ name, score, picture });
@@ -128,6 +131,7 @@ class Game extends Component {
         disabled: !disabled,
         indiceQuestion: indice + 1,
         currentTimer: 30,
+        clicked: false,
       }));
     } else {
       history.push('/feedback');
@@ -140,7 +144,7 @@ class Game extends Component {
   }
 
   render() {
-    const { questions, disabled, currentTimer, indiceQuestion } = this.state;
+    const { questions, disabled, currentTimer, indiceQuestion, clicked } = this.state;
     const question = questions[indiceQuestion];
     console.log(question);
     return (
@@ -165,6 +169,12 @@ class Game extends Component {
                   data-testid={ value.correct === true
                     ? 'correct-answer'
                     : `wrong-answer-${i}` }
+                  id={ value.correct && clicked
+                    ? 'correct-answer'
+                    : '' }
+                  className={ !value.correct && clicked
+                    ? 'wrong-answer'
+                    : '' }
                   onClick={ (event) => this.handleClickAnswer(event, question) }
                 >
                   {value.answer}
