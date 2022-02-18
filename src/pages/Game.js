@@ -22,10 +22,10 @@ class Game extends Component {
     super();
     this.state = {
       assertions: 0,
+      clicked: false,
       currentTimer: 30,
       disabled: false,
       indiceQuestion: 0,
-      clicked: false,
       questions: [],
       score: 0,
     };
@@ -109,13 +109,11 @@ class Game extends Component {
         return {
           assertions,
           score: scorePlayer,
-          visible: !prevState.visible,
         };
       });
     }
     this.setState((prevState) => ({
       disabled: !prevState.disabled,
-      visible: true,
       clicked: true,
     }));
     clearInterval(this.timer);
@@ -169,12 +167,12 @@ class Game extends Component {
                   data-testid={ value.correct === true
                     ? 'correct-answer'
                     : `wrong-answer-${i}` }
-                  id={ value.correct && clicked
+                  className={ value.correct && clicked
                     ? 'correct-answer'
                     : '' }
-                  className={ !value.correct && clicked
-                    ? 'wrong-answer'
-                    : '' }
+                  style={ { border: !value.correct && clicked
+                    ? '3px solid red'
+                    : '' } }
                   onClick={ (event) => this.handleClickAnswer(event, question) }
                 >
                   {value.answer}
@@ -187,7 +185,7 @@ class Game extends Component {
         <div className="next">
           <button
             type="button"
-            style={ disabled ? { visibility: 'visible' } : { visibility: 'collapse' } }
+            style={ clicked ? { visibility: 'visible' } : { visibility: 'collapse' } }
             data-testid="btn-next"
             onClick={ this.handleClickNextQuestion }
           >
